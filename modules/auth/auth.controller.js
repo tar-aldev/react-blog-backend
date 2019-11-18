@@ -30,10 +30,21 @@ module.exports = {
     const accountInfo = await getGoogleAccountByCode(code);
     const userGmailId = accountInfo.resourceName.replace("people/", "");
     console.log("accountInfo", accountInfo);
+
+    /* If we signin in with google but already have user with such email return error */
+    let userByEmail = await User.findOne({
+      email: accountInfo.emailAddresses[0].value,
+    });
+    if (userByEmail) {
+      return res.status(500).json({
+        message:
+          "You already have an account. Please sign in using email and password",
+      });
+    }
     let user = await User.findOne({
       gmailId: userGmailId,
     });
-    if (!user) {
+    /* if (!user) {
       const newUser = new User({
         gmailId: userGmailId,
         nickName: accountInfo.nicknames
@@ -44,7 +55,7 @@ module.exports = {
       user = await newUser.save();
     }
     const token = signJWT({ _id: user._id });
-    res.status(200).json({ message: "Signed in", token });
+    res.status(200).json({ message: "Signed in", token }); */
   },
   googleSigninUrl: async (req, res) => {
     try {

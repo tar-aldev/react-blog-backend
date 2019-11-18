@@ -13,6 +13,12 @@ module.exports = {
   getOne: (req, res) => {},
   addOne: async (req, res) => {
     try {
+      const foundUser = await User.findOne({ email: req.body.email });
+      if (foundUser) {
+        return res
+          .status(500)
+          .json({ message: "User with such email already exists" });
+      }
       const newUser = new User(req.body);
       const user = await newUser.save();
       const token = signJWT({ _id: user._id });

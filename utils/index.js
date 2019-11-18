@@ -74,4 +74,5 @@ module.exports = {
     console.log("fullName", fullName);
     return fullName.replace(" ", "_").toLowerCase();
   },
+  objectEmpty: object => Object.keys(object).length,
 };

@@ -1,8 +1,8 @@
-const router = require("express").Router();
-const controller = require("./auth.controller");
+const router = require('express').Router()
+const controller = require('./auth.controller')
 
-router.post("/signin", controller.signin);
-router.post("/google-signin", controller.googleSignin);
-router.get("/google-signin-url", controller.googleSigninUrl);
+router.post('/signin', controller.signin)
+router.post('/signin-google', controller.googleSignin)
+router.get('/google-signin-url', controller.googleSigninUrl)
 
-module.exports = router;
+module.exports = router
