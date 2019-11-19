@@ -20,7 +20,9 @@ module.exports = {
         ...req.body,
         author: "5dc3f0c64aef5c18da1a785b",
       });
-      const comment = await newComment.save();
+      const createdComment = await newComment.save();
+      const comment = await createdComment.populate("author").execPopulate();
+      console.log("comment", comment);
       res.status(201).json({ message: "Comment created", comment });
     } catch (error) {
       console.log(error, "ERROR CREATE comment");

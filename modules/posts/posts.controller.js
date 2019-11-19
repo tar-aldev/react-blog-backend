@@ -21,14 +21,8 @@ module.exports = {
   },
   addOne: async (req, res) => {
     try {
-      const { plainStringBody, encodedBody } = req.body;
       const author = req.jwtPayload._id;
-      const newPost = new Post({
-        author,
-        title: "Just default title for now",
-        plainStringBody,
-        encodedBody,
-      });
+      const newPost = new Post({ ...req.body, author });
       const post = await newPost.save();
       res.status(201).json({ message: "post created", post });
     } catch (error) {
