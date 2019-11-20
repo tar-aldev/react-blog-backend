@@ -1,19 +1,29 @@
 const bcrypt = require("bcrypt");
 const { Schema, model } = require("mongoose");
 
-const UserSchema = new Schema({
-  gmailId: { type: String, required: false, default: null },
-  nickName: { type: String, required: true },
-  email: { type: String, required: true },
-  /* If no gmailId was provided i.e password is required otherwise don't have password with social authentication */
-  password: {
-    type: String,
-    select: false,
-    required: function() {
-      return !this.gmailId;
+const UserSchema = new Schema(
+  {
+    gmailId: { type: String, required: false, default: null },
+    nickName: { type: String, required: true },
+    email: { type: String, required: true },
+    /* If no gmailId was provided i.e password is required otherwise don't have password with social authentication */
+    password: {
+      type: String,
+      select: false,
+      required: function() {
+        return !this.gmailId;
+      },
     },
   },
-});
+  { toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
+/* 
+UserSchema.virtual("posts", {
+  ref: "post",
+  localField: "_id",
+  foreignField: "author",
+  justOne: false,
+}); */
 
 UserSchema.method("comparePasswords", async function(userPassword) {
   if (this.password) {
