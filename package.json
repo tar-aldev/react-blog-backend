@@ -13,9 +13,11 @@
     "express": "^4.17.1",
     "googleapis": "^44.0.0",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
     "mongodb": "^3.3.3",
     "mongoose": "^5.7.7",
-    "passport": "^0.4.0"
+    "passport": "^0.4.0",
+    "qs": "^6.9.1"
   },
   "devDependencies": {
     "morgan": "^1.9.1",
