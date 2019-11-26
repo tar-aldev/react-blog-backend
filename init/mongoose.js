@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const initMongoose = () => {
   mongoose
-    .connect("mongodb://localhost/blog", {
+    .connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })

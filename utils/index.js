@@ -48,9 +48,9 @@ const setGooglePeopleClient = auth => {
 };
 
 module.exports = {
-  signJWT: payload => {
-    return jwt.sign(payload, "secret", {
-      expiresIn: 60 /* 60 * 60 */, // 1 hour expiration time
+  signJWT: (payload, secret, expiresIn) => {
+    return jwt.sign(payload, secret, {
+      expiresIn,
     });
   },
   getUrlGoogle,

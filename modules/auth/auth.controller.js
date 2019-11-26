@@ -27,8 +27,18 @@ module.exports = {
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = signJWT({ _id: foundUser._id });
-    res.status(200).json({ message: "Signed in", token });
+    const accessToken = signJWT(
+      { _id: foundUser._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_EXP
+    );
+    const refreshToken = signJWT(
+      {},
+      process.env.REFRESH_TOKEN_SECRET,
+      process.env.REFRESH_TOKEN_EXP
+    );
+    // save refresh token to redis?
+    res.status(200).json({ message: "Signed in", accessToken, refreshToken });
   },
   googleSignin: async (req, res) => {
     const { code } = req.body;
@@ -72,6 +82,7 @@ module.exports = {
   },
 
   refreshToken: async (req, res) => {
-    console.log(req);
+    const { accessToken } = req.body;
+    console.log("accessToken", accessToken);
   },
 };
