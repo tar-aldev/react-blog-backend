@@ -1,4 +1,5 @@
 const User = require("../users/users.model");
+const Token = require("./tokens.model");
 const {
   signJWT,
   getUrlGoogle,
@@ -8,8 +9,26 @@ const {
 
 /* 
   acces token - short term of expiration short validity period
-  refresh token - used to generate access token
+  refresh token - used to generate access token.
+  Used only once - after this old refresh token is deleted and new one is generated
 */
+
+const generateTokens = userId => {
+  const accessToken = signJWT(
+    { _id: userId },
+    process.env.ACCESS_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_EXP
+  );
+  const refreshToken = signJWT(
+    {},
+    process.env.REFRESH_TOKEN_SECRET,
+    process.env.REFRESH_TOKEN_EXP
+  );
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
 
 module.exports = {
   signin: async (req, res) => {
@@ -27,18 +46,19 @@ module.exports = {
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const accessToken = signJWT(
-      { _id: foundUser._id },
-      process.env.ACCESS_TOKEN_SECRET,
-      process.env.ACCESS_TOKEN_EXP
-    );
-    const refreshToken = signJWT(
-      {},
-      process.env.REFRESH_TOKEN_SECRET,
-      process.env.REFRESH_TOKEN_EXP
-    );
-    // save refresh token to redis?
-    res.status(200).json({ message: "Signed in", accessToken, refreshToken });
+    const tokens = generateTokens(foundUser._id);
+    const refreshToken = new Token({
+      refreshToken: tokens.refreshToken,
+      userId: foundUser._id,
+    });
+
+    console.log("refreshToken", refreshToken);
+    try {
+      await refreshToken.save();
+      res.status(200).json({ message: "Signed in", ...tokens });
+    } catch (err) {
+      res.json({ message: "Cannot sign in" });
+    }
   },
   googleSignin: async (req, res) => {
     const { code } = req.body;
@@ -82,7 +102,41 @@ module.exports = {
   },
 
   refreshToken: async (req, res) => {
-    const { accessToken } = req.body;
-    console.log("accessToken", accessToken);
+    const { refreshToken } = req.body;
+    try {
+      const foundToken = await Token.findOne({ refreshToken }).exec();
+      if (!!foundToken) {
+        const { _id, userId } = foundToken;
+        const newTokensPair = generateTokens(userId);
+
+        const newRefreshToken = new Token({
+          userId,
+          refreshToken: newTokensPair.refreshToken,
+        });
+
+        await Promise.all([
+          newRefreshToken.save(),
+          Token.findByIdAndDelete(_id).exec(),
+        ]);
+
+        return res
+          .status(200)
+          .json({ message: "token refeshed!", ...newTokensPair });
+      }
+      return res.status(401).json({ message: "Invalid refresh token" });
+    } catch (error) {
+      console.log("error TOKEN FIND AND DELETE", error);
+      return res.status(500).json({ message: "Cannot refresh token" });
+    }
+  },
+  revokeToken: async (req, res, next) => {
+    const { refreshToken } = req.body;
+    try {
+      await Token.findOneAndDelete({ refreshToken }).exec();
+      return res.status(401).json({ message: "Successfully revoked token" });
+    } catch (error) {
+      console.log("error TOKEN FIND AND DELETE", error);
+      return res.status(500).json({ message: "Cannot revoke token" });
+    }
   },
 };
