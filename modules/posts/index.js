@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const controller = require("./posts.controller");
-const checkToken = require("../../middleware/checkToken");
+const withAuth = require("../../middleware/withAuth");
 
-router.get("/", controller.getPaginated);
+router.get("/", withAuth(true), controller.getPaginated);
 router.get("/:id", controller.getOne);
-router.post("/", checkToken, controller.addOne);
-router.patch("/", controller.update);
+router.post("/", withAuth(), controller.addOne);
+router.put("/:id", controller.update);
 
 module.exports = router;

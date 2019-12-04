@@ -6,6 +6,11 @@ const {
   generateNickname,
 } = require("../../utils/index");
 
+/* 
+  acces token - short term of expiration short validity period
+  refresh token - used to generate access token
+*/
+
 module.exports = {
   signin: async (req, res) => {
     console.log("SIGN IN PLAIN");
@@ -41,9 +46,9 @@ module.exports = {
           "You already have an account. Please sign in using email and password",
       });
     }
-    let user = await User.findOne({
+    /* let user = await User.findOne({
       gmailId: userGmailId,
-    });
+    }); */
     /* if (!user) {
       const newUser = new User({
         gmailId: userGmailId,
@@ -64,5 +69,9 @@ module.exports = {
     } catch (error) {
       console.log("GET GOOGLE LOGIN URL ERROR:", error);
     }
+  },
+
+  refreshToken: async (req, res) => {
+    console.log(req);
   },
 };
