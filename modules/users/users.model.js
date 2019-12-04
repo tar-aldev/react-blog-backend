@@ -1,12 +1,20 @@
 const bcrypt = require("bcrypt");
 const { Schema, model } = require("mongoose");
 
+const AvatarSchema = new Schema({
+  fileName: { type: String, required: true },
+  originalFileName: { type: String, required: true },
+});
+
 const UserSchema = new Schema(
   {
     gmailId: { type: String, required: false, default: null },
+    email: { type: String, immutable: true, required: true },
     nickName: { type: String, required: true },
-    email: { type: String, required: true },
     /* If no gmailId was provided i.e password is required otherwise don't have password with social authentication */
+    firstName: { type: String },
+    lastName: { type: String },
+    avatar: AvatarSchema,
     password: {
       type: String,
       select: false,
@@ -39,8 +47,7 @@ UserSchema.method("comparePasswords", async function(userPassword) {
 
 UserSchema.pre("save", async function(next) {
   if (this.password) {
-    const hashedPassword = await bcrypt.hash(this.password, 10);
-    this.password = hashedPassword;
+    this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });

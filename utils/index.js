@@ -36,8 +36,7 @@ const getConnectionUrl = auth => {
  * Create the google url to be sent to the client.
  */
 const getUrlGoogle = () => {
-  const url = getConnectionUrl(createConnection());
-  return url;
+  return getConnectionUrl(createConnection());
 };
 
 const setGooglePeopleClient = auth => {
@@ -48,8 +47,11 @@ const setGooglePeopleClient = auth => {
 };
 
 module.exports = {
-  signJWT: payload => {
-    return jwt.sign(payload, "secret");
+  signJWT: (payload, secret, expiresIn) => {
+    console.log("expiresIn", expiresIn, secret);
+    return jwt.sign(payload, secret, {
+      expiresIn: Number(expiresIn),
+    });
   },
   getUrlGoogle,
   getGoogleAccountByCode: async code => {
