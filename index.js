@@ -6,14 +6,15 @@ const morgan = require("morgan");
 require("dotenv").config();
 const app = express();
 const initMongoose = require("./init/mongoose");
-const initRedis = require("./init/redis");
 const PATH_TO_FRONTEND_STATIC = path.join(__dirname, "../articles-app/build");
 
+app.use(express.static("public"));
 app.use(cors());
 app.use(morgan("dev"));
 
 app.use(express.static(PATH_TO_FRONTEND_STATIC));
 app.use(bodyParser.json());
+
 /* API ROUTES */
 app.use("/api", require("./modules/api.routes"));
 
@@ -22,7 +23,6 @@ app.use("**", (req, res) => {
 });
 const PORT = process.env.PORT;
 
-/* initRedis(); */
 initMongoose();
 app.listen(PORT, () => {
   console.log(`Successfully started server on port http://localhost:${PORT}`);

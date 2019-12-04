@@ -104,7 +104,9 @@ module.exports = {
   refreshToken: async (req, res) => {
     const { refreshToken } = req.body;
     try {
-      const foundToken = await Token.findOne({ refreshToken }).exec();
+      const foundToken = await Token.findOne({
+        refreshToken,
+      }).exec();
       if (!!foundToken) {
         const { _id, userId } = foundToken;
         const newTokensPair = generateTokens(userId);
@@ -114,10 +116,8 @@ module.exports = {
           refreshToken: newTokensPair.refreshToken,
         });
 
-        await Promise.all([
-          newRefreshToken.save(),
-          Token.findByIdAndDelete(_id).exec(),
-        ]);
+        await newRefreshToken.save();
+        await Token.findByIdAndDelete(_id).exec();
 
         return res
           .status(200)
