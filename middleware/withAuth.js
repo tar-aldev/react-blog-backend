@@ -5,14 +5,14 @@ module.exports = (error = true) => (req, res, next) => {
   const { authorization } = req.headers;
   try {
     const token = authorization.split(" ")[1];
-    req.jwtPayload = jwt.verify(token, "secret");
+    req.jwtPayload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     next();
   } catch (e) {
     console.log("error token decode", e);
     if (error) {
-      return res.status(401).json({
-        message: e.message || "Not authenticated!",
-      });
+      return res
+        .status(401)
+        .json({ message: e.message || "Not authenticated!" });
     }
     req.jwtPayload = {};
     next();

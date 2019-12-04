@@ -1,5 +1,4 @@
 const User = require("../users/users.model");
-const Token = require("./tokens.model");
 const {
   signJWT,
   getUrlGoogle,
@@ -7,7 +6,7 @@ const {
   generateNickname,
 } = require("../../utils/index");
 
-/* 
+/*
   acces token - short term of expiration short validity period
   refresh token - used to generate access token.
   Used only once - after this old refresh token is deleted and new one is generated
@@ -78,7 +77,7 @@ module.exports = {
     }
     /* let user = await User.findOne({
       gmailId: userGmailId,
-    }); */
+    });
     /* if (!user) {
       const newUser = new User({
         gmailId: userGmailId,
