@@ -15,10 +15,11 @@ module.exports = {
   },
   getOne: (req, res) => {},
   addOne: async (req, res) => {
+    const { _id } = req.jwtPayload;
     try {
       const newComment = new Comment({
         ...req.body,
-        author: "5dc3f0c64aef5c18da1a785b",
+        author: _id,
       });
       const createdComment = await newComment.save();
       const comment = await createdComment.populate("author").execPopulate();
@@ -29,5 +30,35 @@ module.exports = {
       res.status(500).json({ message: "Cannot create comment", error });
     }
   },
-  update: (req, res) => {},
+  update: async (req, res) => {
+    const { id: commentId } = req.params;
+    const { _id } = req.jwtPayload;
+    try {
+      const result = await Comment.findOneAndUpdate(
+        { author: _id, _id: commentId },
+        req.body,
+        {
+          new: true,
+        }
+      )
+        .populate("author")
+        .exec();
+      return res
+        .status(201)
+        .json({ message: "Comment updated", comment: result });
+    } catch (error) {}
+  },
+
+  delete: async (req, res) => {
+    const { id: commentId } = req.params;
+    const { _id } = req.jwtPayload;
+
+    try {
+      await Comment.findOneAndDelete({
+        author: _id,
+        _id: commentId,
+      }).exec();
+      return res.status(200).json({ message: "Comment deleted" });
+    } catch (error) {}
+  },
 };

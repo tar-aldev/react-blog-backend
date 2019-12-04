@@ -5,9 +5,7 @@ module.exports = (error = true) => (req, res, next) => {
   const { authorization } = req.headers;
   try {
     const token = authorization.split(" ")[1];
-    console.log("token", token);
-    const payload = jwt.verify(token, "secret");
-    req.jwtPayload = payload;
+    req.jwtPayload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     next();
   } catch (e) {
     console.log("error token decode", e);
